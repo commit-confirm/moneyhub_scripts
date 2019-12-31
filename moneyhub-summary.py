@@ -3,7 +3,7 @@ import sys
 import argparse
 
 # define the program description
-description = 'This script will take in moneyhub statements and perform some analysis.'
+description = 'This script will take in moneyhub statements and perform some basic analysis.'
 
 # initiate the parser with a description
 parser = argparse.ArgumentParser(description)
