@@ -2,6 +2,14 @@ import pandas as pd
 import sys
 import argparse
 
+
+"""
+TO DO
+1) Tidy up three functions for filtering transction type
+2) Fix output file argparse flag
+3) Validate summary results against moneyhub
+"""
+
 # define the program description
 description = (
     "This script will take in moneyhub statements and perform some basic analysis."
@@ -47,6 +55,20 @@ def ignore_transfers(df):
     """
     return df[~df["TRANSACTION TYPE"].str.contains("Transfer")]
 
+def income_only(df):
+    """ 
+    A simple function to run inverted string contain checks on the master table and return 
+    any rows which do not contain TRANCTION TYPE = Trasfer
+    """
+    return df[df["TRANSACTION TYPE"].str.contains("Income")]
+
+def expenditure_only(df):
+    """ 
+    A simple function to run inverted string contain checks on the master table and return 
+    any rows which do not contain TRANCTION TYPE = Trasfer
+    """
+    return df[df["TRANSACTION TYPE"].str.contains("Outgoing")]
+
 
 def monthly_summary(df):
     """
@@ -69,15 +91,31 @@ def monthly_summary(df):
 transactions["TRANSACTION TYPE"] = transactions.apply(transaction_check, axis=1)
 
 # Output to file if requested
-if args.output_file is True:
+if args.output_file is not None:
     transactions.to_csv(args.output_file)
+
 
 # Print summary if requested
 if args.summary is True:
-    noTrasnfers = ignore_transfers(transactions)
+    noTransfers = ignore_transfers(transactions)
+    income = income_only(transactions)
+    expenditure = expenditure_only(transactions)
+    
+    income_summary = monthly_summary(income)
+    expenditure_summary = monthly_summary(expenditure)
+    noTransfers = monthly_summary(noTransfers)
+
+    summary = pd.concat([income_summary, expenditure_summary, noTransfers], axis=1,
+                        keys=['Income', 'Expenditure', 'Total'],
+                        sort = False )
+    #summary = income_summary
+
     print(
         'The summary below adds up any transaction within each month provided they are not "transfers".'
     )
     print("This will let you see if you spent more than you earned in a month. \n")
-    print(monthly_summary(noTrasnfers))
+    #print(monthly_summary(noTransfers))
+    print(summary)
+
     print("\n")
+    print(args)
