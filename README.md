@@ -50,3 +50,7 @@ August       1333.22
 June         1444.22
 Name: AMOUNT, dtype: float64
 ```
+
+
+## TODO
+1) Tidy up three functions for filtering transction type
